@@ -1,0 +1,26 @@
+.content {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  justify-content: center;
+  justify-self: flex-end;
+  margin: 2rem;
+}
+
+.content .array-element {
+  width: 0.5rem;
+  margin: 0 0.1rem;
+  background-color: hsl(286, 49%, 41%);
+}
+
+.content .array-element .comparing {
+  width: 0.5rem;
+  margin: 0 0.1rem;
+  background-color: hsl(39, 79%, 59%);
+}
+
+.content .array-element .compared {
+  width: 0.5rem;
+  margin: 0 0.1rem;
+  background-color: hsl(207, 79%, 59%);
+}

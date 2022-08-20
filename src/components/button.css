@@ -1,0 +1,12 @@
+.btn {
+  border: none;
+  outline: none;
+  color: hsl(187, 9%, 100%);
+  margin: 0.5rem;
+  cursor: pointer;
+  background: none;
+}
+
+.btn:hover, .btn:focus {
+  color:hsl(187, 9%, 80%);
+}

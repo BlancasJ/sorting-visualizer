@@ -1,0 +1,37 @@
+.input {
+  border: none;
+  outline: none;
+  background: none;
+  color: hsl(187, 9%, 100%);
+  margin: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  display: flex;
+  flex-direction: column;
+}
+
+.input input[type=range] {
+  outline:none;
+  -webkit-appearance: none;
+  background: hsl(187, 9%, 100%);
+  border-radius: 5rem;
+  cursor: pointer;
+  margin: 0.5rem;
+}
+
+.input input[type=range]:focus {
+  color: hsl(187, 9%, 80%);
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 9px;
+  height: 9px;
+  background: hsl(286, 49%, 41%);
+  cursor: pointer;
+  border-radius:30px;
+  outline:none;
+}
+

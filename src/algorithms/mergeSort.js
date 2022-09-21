@@ -1,162 +1,159 @@
-let arrayStates = [];
+const buildMergeView = (arr, l, r, k, L, R, iL, jR) => {
+  const view = arr.slice();
+  let pos = k;
+  for (let x = iL; x < L.length; x++) view[pos++] = L[x];
+  for (let y = jR; y < R.length; y++) view[pos++] = R[y];
+  return view;
+};
 
-// Merges two subarrays of arr[].
-// First subarray is arr[l..m]
-// Second subarray is arr[m+1..r]
-function merge(arr, l, m, r) {
-  const n1 = m - l + 1;
-  const n2 = r - m;
+const stateFrom = (view, comparingSet, comparedSet) => view.map((value, index) => ({
+  comparing: comparingSet.has(index),
+  compared: comparedSet.has(index),
+  value,
+}));
 
-  // Create temp arrays
-  const L = new Array(n1); 
-  const R = new Array(n2);
+const merge = (arr, l, m, r, steps) => {
+  const L = arr.slice(l, m + 1);
+  const R = arr.slice(m + 1, r + 1);
 
-  // Copy data to temp arrays L[] and R[]
-  for (let i = 0; i < n1; i++)
-      L[i] = arr[l + i];
-  for (let j = 0; j < n2; j++)
-      R[j] = arr[m + 1 + j];
-
-  // Merge the temp arrays back into arr[l..r]
-
-  // Initial index of first subarray
   let i = 0;
-
-  // Initial index of second subarray
   let j = 0;
-
-  // Initial index of merged subarray
   let k = l;
 
-  while (i < n1 && j < n2) {
-    if (L[i] <= R[j]) {
-      arrayStates.push([
-        ...arr.map((value, index) => {
-          return ({
-            comparing: index === k || index === i + l,
-            compared: false,
-            value,
-          });
-        })
-      ]);
-      arr[k] = L[i];
-      arrayStates.push([
-        ...arr.map((value, index) => {
-          return ({
-            comparing: index === k || index === i + l,
-            compared: false,
-            value,
-          });
-        })
-      ]);
+  const rangeHighlight = new Set();
+  for (let idx = l; idx <= r; idx++) rangeHighlight.add(idx);
+
+  steps.push({
+    state: stateFrom(buildMergeView(arr, l, r, k, L, R, i, j), rangeHighlight, new Set()),
+    arrows: [l, m, r],
+    message: {
+      en: `Merging sub-arrays ${l}..${m} (left) and ${m + 1}..${r} (right) into one sorted range.`,
+      es: `Mezclamos los sub-arreglos ${l}..${m} (izquierda) y ${m + 1}..${r} (derecha) en un único tramo ordenado.`,
+    },
+  });
+
+  while (i < L.length && j < R.length) {
+    const leftVal = L[i];
+    const rightVal = R[j];
+    const leftIdx = k;
+    const rightIdx = k + (L.length - i);
+
+    steps.push({
+      state: stateFrom(
+        buildMergeView(arr, l, r, k, L, R, i, j),
+        new Set([leftIdx, rightIdx]),
+        new Set(),
+      ),
+      arrows: [leftIdx, rightIdx],
+      message: {
+        en: `Compare the next left value ${leftVal} with the next right value ${rightVal}.`,
+        es: `Comparamos el siguiente valor de la izquierda (${leftVal}) con el de la derecha (${rightVal}).`,
+      },
+    });
+
+    if (leftVal <= rightVal) {
+      arr[k] = leftVal;
       i++;
-    }
-    else {
-      arrayStates.push([
-        ...arr.map((value, index) => {
-          return ({
-            comparing: index === k || index === j + m + l,
-            compared: false,
-            value,
-          });
-        })
-      ]);
-      arr[k] = R[j];
-      arrayStates.push([
-        ...arr.map((value, index) => {
-          return ({
-            comparing: index === k || index === j + m + l,
-            compared: false,
-            value,
-          });
-        })
-      ]);
+    } else {
+      arr[k] = rightVal;
       j++;
     }
+
+    steps.push({
+      state: stateFrom(
+        buildMergeView(arr, l, r, k + 1, L, R, i, j),
+        new Set([k]),
+        new Set(),
+      ),
+      arrows: [k],
+      message: {
+        en: `${arr[k]} is smaller (or equal): it goes into position ${k}.`,
+        es: `${arr[k]} es menor (o igual): va a la posición ${k}.`,
+      },
+    });
     k++;
   }
 
-  // Copy the remaining elements of
-  // L[], if there are any
-  while (i < n1) {
-    arrayStates.push([
-      ...arr.map((value, index) => {
-        return ({
-          comparing: index === k || index === i + l,
-          compared: false,
-          value,
-        });
-      })
-    ]);
+  while (i < L.length) {
     arr[k] = L[i];
-    arrayStates.push([
-      ...arr.map((value, index) => {
-        return ({
-          comparing: index === k || index === i + l,
-          compared: false,
-          value,
-        });
-      })
-    ]);
+    steps.push({
+      state: stateFrom(
+        buildMergeView(arr, l, r, k + 1, L, R, i + 1, j),
+        new Set([k]),
+        new Set(),
+      ),
+      arrows: [k],
+      message: {
+        en: `Right side is done. Copy remaining left value ${L[i]} into position ${k}.`,
+        es: `El lado derecho terminó. Copiamos el restante ${L[i]} de la izquierda en la posición ${k}.`,
+      },
+    });
     i++;
     k++;
   }
 
-  // Copy the remaining elements of
-  // R[], if there are any
-  while (j < n2) {
-    arrayStates.push([
-      ...arr.map((value, index) => {
-        return ({
-          comparing: index === k || index === j + m + l,
-          compared: false,
-          value,
-        });
-      })
-    ]);
+  while (j < R.length) {
     arr[k] = R[j];
-    arrayStates.push([
-      ...arr.map((value, index) => {
-        return ({
-          comparing: index === k || index === j + m + l,
-          compared: false,
-          value,
-        });
-      })
-    ]);
+    steps.push({
+      state: stateFrom(
+        buildMergeView(arr, l, r, k + 1, L, R, i, j + 1),
+        new Set([k]),
+        new Set(),
+      ),
+      arrows: [k],
+      message: {
+        en: `Left side is done. Copy remaining right value ${R[j]} into position ${k}.`,
+        es: `El lado izquierdo terminó. Copiamos el restante ${R[j]} de la derecha en la posición ${k}.`,
+      },
+    });
     j++;
     k++;
   }
-}
+};
+
+const recurse = (arr, l, r, steps) => {
+  if (l >= r) return;
+  const m = l + Math.floor((r - l) / 2);
+  steps.push({
+    state: arr.map((value, index) => ({
+      comparing: index >= l && index <= r,
+      compared: false,
+      value,
+    })),
+    arrows: [l, m, r],
+    message: {
+      en: `Split range ${l}..${r} at index ${m}: we sort each half first and then merge them.`,
+      es: `Dividimos el tramo ${l}..${r} en el índice ${m}: ordenamos primero cada mitad y luego las mezclamos.`,
+    },
+  });
+  recurse(arr, l, m, steps);
+  recurse(arr, m + 1, r, steps);
+  merge(arr, l, m, r, steps);
+};
 
 export const mergeSort = (array) => {
-  const newArray = [...array]
-  arrayStates = [];
+  const newArray = [...array];
+  const steps = [];
 
-  // l is for left index and r is
-  // right index of the sub-array
-  // of arr to be sorted */
-  const getMergeSort = (arr, l, r) => {
-    if(l >= r){
-      return;//returns recursively
-    }
-    let m = l + parseInt((r - l) / 2);
-    getMergeSort(arr, l, m);
-    getMergeSort(arr, m + 1, r);
-    merge(arr, l, m, r);
-  };
+  steps.push({
+    state: newArray.map(value => ({ comparing: false, compared: false, value })),
+    arrows: [],
+    message: {
+      en: 'Merge Sort: divide and conquer. We split the array in halves recursively until each piece has one element, then merge them back in order.',
+      es: 'Merge Sort: divide y vencerás. Partimos el arreglo a la mitad recursivamente hasta tener trozos de un elemento, y luego los mezclamos en orden.',
+    },
+  });
 
-  getMergeSort(newArray, 0, newArray.length - 1);
+  recurse(newArray, 0, newArray.length - 1, steps);
 
-  arrayStates.push([
-    ...newArray.map((value) => {
-      return ({
-        comparing: false,
-        compared: true,
-        value,
-      });
-    })
-  ]);
+  steps.push({
+    state: newArray.map(value => ({ comparing: false, compared: true, value })),
+    arrows: [],
+    message: {
+      en: 'Array sorted! Merge Sort is always O(n log n) but needs O(n) extra memory.',
+      es: '¡Arreglo ordenado! Merge Sort siempre es O(n log n) pero requiere O(n) memoria extra.',
+    },
+  });
 
-  return arrayStates;
+  return steps;
 };

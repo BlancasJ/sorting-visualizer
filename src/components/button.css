@@ -1,12 +1,23 @@
 .btn {
-  border: none;
+  border: 1px solid hsl(187, 30%, 60%);
+  border-radius: 4px;
   outline: none;
   color: hsl(187, 9%, 100%);
-  margin: 0.5rem;
+  padding: 0.35rem 0.75rem;
+  margin: 0.15rem;
   cursor: pointer;
-  background: none;
+  background: transparent;
+  font-size: 0.85rem;
+  transition: background-color 150ms ease, color 150ms ease, border-color 150ms ease;
 }
 
-.btn:hover, .btn:focus {
-  color:hsl(187, 9%, 80%);
+.btn:hover:not(:disabled), .btn:focus:not(:disabled) {
+  background-color: hsl(286, 49%, 41%);
+  border-color: hsl(286, 49%, 55%);
+  color: hsl(187, 9%, 100%);
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }

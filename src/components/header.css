@@ -1,22 +1,71 @@
 .header {
   display: flex;
   flex-direction: column;
+  align-items: stretch;
+  background-color: hsl(193, 60%, 18%);
+  padding: 0.4rem 0.75rem 0.5rem 0.75rem;
+  flex: 0 0 auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}
+
+.head-top {
+  display: flex;
   align-items: center;
-  background-color: hsl(193, 60%, 20%);
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0 0.25rem;
 }
 
-.header .head-title {
+.head-title {
   color: whitesmoke;
+  font-size: 1.1rem;
+  margin: 0.1rem 0 0.35rem 0;
+  letter-spacing: 0.5px;
 }
 
-.header .head-options {
+.lang-switch {
+  display: inline-flex;
+  border: 1px solid hsl(187, 30%, 55%);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.lang-btn {
+  background: transparent;
+  color: hsl(187, 9%, 85%);
+  border: none;
+  padding: 0.15rem 0.5rem;
+  font-size: 0.72rem;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: background-color 150ms ease, color 150ms ease;
+}
+
+.lang-btn + .lang-btn {
+  border-left: 1px solid hsl(187, 30%, 55%);
+}
+
+.lang-btn:hover {
+  background-color: hsl(193, 40%, 25%);
+  color: hsl(187, 9%, 100%);
+}
+
+.lang-btn.active {
+  background-color: hsl(286, 49%, 45%);
+  color: hsl(187, 9%, 100%);
+}
+
+.head-options {
   display: flex;
   flex-direction: row;
-  justify-content: space-evenly;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 0.15rem 0.5rem;
   width: 100%;
 }
 
-.header .head-options .button-container {
+.button-container {
   display: flex;
   align-items: center;
 }

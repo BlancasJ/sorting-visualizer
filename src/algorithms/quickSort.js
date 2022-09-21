@@ -1,125 +1,108 @@
-let arrayStates = [];
+const snapshot = (arr, comparingSet, comparedSet) => arr.map((value, index) => ({
+  comparing: comparingSet.has(index),
+  compared: comparedSet.has(index),
+  value,
+}));
 
-// algorithm from https://www.geeksforgeeks.org/quick-sort/
+const partition = (arr, low, high, steps) => {
+  const pivot = arr[high];
 
-// A utility function to swap two elements
-function swap(arr, i, j) {
-  let temp = arr[i];
-  arr[i] = arr[j];
-  arr[j] = temp;
-}
+  steps.push({
+    state: snapshot(arr, new Set(), new Set([high])),
+    arrows: [high],
+    message: {
+      en: `Pick pivot = ${pivot} at position ${high}. We will move smaller values to its left.`,
+      es: `Elegimos pivote = ${pivot} en la posición ${high}. Moveremos los menores a su izquierda.`,
+    },
+  });
 
-/* This function takes last element as pivot, places
-the pivot element at its correct position in sorted
-array, and places all smaller (smaller than pivot)
-to left of pivot and all greater elements to right
- of pivot */
-function partition(arr, low, high) {
-
-  // pivot
-  let pivot = arr[high];
-
-  // Index of smaller element and
-  // indicates the right position
-  // of pivot found so far
-  let i = (low - 1);
-  arrayStates.push([
-    ...arr.map((value, index) => {
-      return ({
-        comparing: false,
-        compared: index === high,
-        value,
-      });
-    })
-  ]);
+  let i = low - 1;
 
   for (let j = low; j <= high - 1; j++) {
+    steps.push({
+      state: snapshot(arr, new Set([j]), new Set([high])),
+      arrows: [j, high],
+      message: {
+        en: `Compare ${arr[j]} (pos ${j}) with pivot ${pivot}.`,
+        es: `Comparamos ${arr[j]} (pos ${j}) con el pivote ${pivot}.`,
+      },
+    });
 
-      // If current element is smaller 
-      // than the pivot
-      if (arr[j] < pivot) {
-          // Increment index of 
-          // smaller element
-          i++;
-          arrayStates.push([
-            ...arr.map((value, index) => {
-              return ({
-                comparing: index === j || index === i,
-                compared: index === high,
-                value,
-              });
-            })
-          ]);
-          swap(arr, i, j);
-          arrayStates.push([
-            ...arr.map((value, index) => {
-              return ({
-                comparing: index === j || index === i,
-                compared: index === high,
-                value,
-              });
-            })
-          ]);
+    if (arr[j] < pivot) {
+      i++;
+      if (i !== j) {
+        const tmp = arr[i];
+        arr[i] = arr[j];
+        arr[j] = tmp;
+        steps.push({
+          state: snapshot(arr, new Set([i, j]), new Set([high])),
+          arrows: [i, j],
+          message: {
+            en: `${arr[i]} < ${pivot}: swap it into the "smaller than pivot" zone at position ${i}.`,
+            es: `${arr[i]} < ${pivot}: lo movemos a la zona "menor que el pivote" en la posición ${i}.`,
+          },
+        });
+      } else {
+        steps.push({
+          state: snapshot(arr, new Set([i]), new Set([high])),
+          arrows: [i],
+          message: {
+            en: `${arr[i]} < ${pivot}: it already sits at the boundary (pos ${i}).`,
+            es: `${arr[i]} < ${pivot}: ya estaba en la frontera (pos ${i}).`,
+          },
+        });
       }
-  }
-  arrayStates.push([
-    ...arr.map((value, index) => {
-      return ({
-        comparing: index === high || index === i + 1,
-        compared: false,
-        value,
-      });
-    })
-  ]);
-  swap(arr, i + 1, high);
-  arrayStates.push([
-    ...arr.map((value, index) => {
-      return ({
-        comparing: index === high || index === i + 1,
-        compared: false,
-        value,
-      });
-    })
-  ]);
-  return (i + 1);
-}
-
-export const quickSort = (array) => {
-  arrayStates = []
-  const newArray = [...array];
-
-  /* The main function that implements QuickSort
-        arr[] --> Array to be sorted,
-        low --> Starting index,
-        high --> Ending index
-*/
-  const getQuickSort = (arr, low, high) => {
-    if (low < high) {
-
-        // pi is partitioning index, arr[p]
-        // is now at right place 
-        let pi = partition(arr, low, high);
-
-        // Separately sort elements before
-        // partition and after partition
-        getQuickSort(arr, low, pi - 1);
-        getQuickSort(arr, pi + 1, high);
-    } else {
-      return;
     }
   }
 
-  getQuickSort(newArray, 0, newArray.length - 1);
+  const pivotFinal = i + 1;
+  if (pivotFinal !== high) {
+    const tmp = arr[pivotFinal];
+    arr[pivotFinal] = arr[high];
+    arr[high] = tmp;
+  }
+  steps.push({
+    state: snapshot(arr, new Set(), new Set([pivotFinal])),
+    arrows: [pivotFinal],
+    message: {
+      en: `Place the pivot at position ${pivotFinal}: every value on its left is smaller, every value on its right is greater or equal.`,
+      es: `Colocamos el pivote en la posición ${pivotFinal}: todo a su izquierda es menor y todo a su derecha es mayor o igual.`,
+    },
+  });
 
-  arrayStates.push([
-    ...newArray.map((value) => {
-      return ({
-        comparing: false,
-        compared: true,
-        value,
-      });
-    })
-  ]);
+  return pivotFinal;
+};
 
-  return arrayStates;
+const recurse = (arr, low, high, steps) => {
+  if (low >= high) return;
+  const pi = partition(arr, low, high, steps);
+  recurse(arr, low, pi - 1, steps);
+  recurse(arr, pi + 1, high, steps);
+};
+
+export const quickSort = (array) => {
+  const newArray = [...array];
+  const steps = [];
+
+  steps.push({
+    state: newArray.map(value => ({ comparing: false, compared: false, value })),
+    arrows: [],
+    message: {
+      en: 'Quick Sort: pick a pivot, partition the array so smaller values sit on the left and larger on the right, then recursively sort each side.',
+      es: 'Quick Sort: escogemos un pivote, reorganizamos para que los menores queden a su izquierda y los mayores a su derecha, y luego ordenamos cada lado recursivamente.',
+    },
+  });
+
+  recurse(newArray, 0, newArray.length - 1, steps);
+
+  steps.push({
+    state: newArray.map(value => ({ comparing: false, compared: true, value })),
+    arrows: [],
+    message: {
+      en: 'Array sorted! Quick Sort averages O(n log n) and usually beats Merge Sort in practice, though its worst case is O(n²).',
+      es: '¡Arreglo ordenado! Quick Sort promedia O(n log n) y suele ganarle a Merge Sort en la práctica, aunque su peor caso es O(n²).',
+    },
+  });
+
+  return steps;
 };

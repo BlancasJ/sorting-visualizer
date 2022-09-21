@@ -1,37 +1,49 @@
 .input {
-  border: none;
-  outline: none;
-  background: none;
-  color: hsl(187, 9%, 100%);
-  margin: 0.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: space-evenly;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: hsl(187, 9%, 100%);
+  margin: 0.15rem 0.25rem;
+  font-size: 0.75rem;
+}
+
+.input label {
+  margin-bottom: 0.15rem;
+  opacity: 0.85;
 }
 
 .input input[type=range] {
-  outline:none;
   -webkit-appearance: none;
-  background: hsl(187, 9%, 100%);
+  appearance: none;
+  width: 110px;
+  height: 4px;
+  background: hsl(187, 9%, 80%);
   border-radius: 5rem;
   cursor: pointer;
-  margin: 0.5rem;
+  outline: none;
 }
 
 .input input[type=range]:focus {
-  color: hsl(187, 9%, 80%);
+  background: hsl(187, 9%, 100%);
 }
 
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 9px;
-  height: 9px;
-  background: hsl(286, 49%, 41%);
+  width: 12px;
+  height: 12px;
+  background: hsl(286, 49%, 55%);
   cursor: pointer;
-  border-radius:30px;
-  outline:none;
+  border-radius: 50%;
+  border: 2px solid hsl(187, 9%, 100%);
 }
 
+input[type="range"]::-moz-range-thumb {
+  width: 12px;
+  height: 12px;
+  background: hsl(286, 49%, 55%);
+  cursor: pointer;
+  border-radius: 50%;
+  border: 2px solid hsl(187, 9%, 100%);
+}

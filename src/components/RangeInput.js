@@ -1,7 +1,7 @@
 import React from 'react'
 import './input.css';
 
-export const RangeInput = ({ id, label, onChange, value, min, max }) => {
+export const RangeInput = ({ id, label, onChange, value, min, max, disabled = false }) => {
   return (
     <div className='input'>
       <label htmlFor={id}>{label}</label>
@@ -12,7 +12,8 @@ export const RangeInput = ({ id, label, onChange, value, min, max }) => {
         max={max}
         value={value}
         onChange={onChange}
-        />
+        disabled={disabled}
+      />
     </div>
   )
 }
